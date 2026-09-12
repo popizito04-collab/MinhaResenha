@@ -1,0 +1,109 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Editar filme - MinhaResenha</title>
+
+</head>
+
+<body>
+
+    <h1>✏️ Editar filme</h1>
+
+    <h2>{{ filme[1] }}</h2>
+
+    <p>🖼️ Capa atual:</p>
+
+    <img
+        src="{{ url_for('static', filename='imagens/' + filme[5]) }}"
+        width="200"
+    >
+
+    <br><br>
+
+    <form
+        action="/admin/editar-filme/{{ filme[0] }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <label for="titulo">Título:</label>
+
+        <input
+            type="text"
+            id="titulo"
+            name="titulo"
+            value="{{ filme[1] }}"
+            required
+        >
+
+        <br><br>
+
+        <label for="ano">Ano:</label>
+
+        <input
+            type="number"
+            id="ano"
+            name="ano"
+            value="{{ filme[2] }}"
+            required
+        >
+
+        <br><br>
+
+        <label for="genero">Gênero:</label>
+
+        <input
+            type="text"
+            id="genero"
+            name="genero"
+            value="{{ filme[3] }}"
+            required
+        >
+
+        <br><br>
+
+        <label for="sinopse">Sinopse:</label>
+
+        <br>
+
+        <textarea
+            id="sinopse"
+            name="sinopse"
+            required
+        >{{ filme[4] }}</textarea>
+
+        <br><br>
+
+        <label for="imagem">Trocar capa:</label>
+
+        <input
+            type="file"
+            id="imagem"
+            name="imagem"
+            accept="image/*"
+        >
+
+        <br><br>
+
+        <button type="submit">
+            💾 Salvar alterações
+        </button>
+
+    </form>
+
+    <br>
+
+    <a href="/admin">
+        ⬅️ Voltar para administração
+    </a>
+
+</body>
+
+</html>
+```

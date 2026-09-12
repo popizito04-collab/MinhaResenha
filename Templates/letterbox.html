@@ -1,0 +1,55 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MinhaResenha</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='letterbox.css') }}">
+
+</head>
+
+<body>
+
+    <header>
+        <h1> MinhaResenha</h1>
+
+        <nav>
+            <a href="/">Início</a>
+            <a href="/filmes">Filmes</a>
+            <a href="/resenhas">Resenhas</a>
+            <a href="/logout">Sair</a>
+            <a href="cadastro">Cadastrar</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <h2>Filmes populares</h2>
+
+        <section>
+{% for filme in filmes %}
+
+<div>
+
+     <img src="{{ url_for('static', filename='imagens/' + filme[5]) }}">
+>
+
+    <h3>🎬 {{ filme[1] }}</h3>
+
+    <p>📅 Ano: {{ filme[2] }}</p>
+
+    <p>🎭 Gênero: {{ filme[3] }}</p>
+
+    <p>⭐ Nota: 4.8/5</p>
+
+    <a href="/filme/{{ filme[0] }}">Ver filme</a>
+
+</div>
+
+{% endfor %}
+        </section>
+
+    </main>
+
+</body>
+</html>

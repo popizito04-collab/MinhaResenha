@@ -1,0 +1,301 @@
+/* ==========================================================
+   MinhaResenha — tema "ingresso de cinema"
+   ========================================================== */
+
+:root {
+  --ink: #170f0d;
+  --ink-vignette: #241a15;
+  --maroon: #8b2635;
+  --maroon-dark: #6b1d29;
+  --gold: #c9a227;
+  --gold-light: #e4c25e;
+  --teal: #3e5c50;
+  --paper: #f1e7d2;
+  --paper-line: #d9c9a6;
+  --text-on-paper: #241b15;
+  --text-muted: #6b5d4e;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Space Grotesk", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--paper);
+  background: radial-gradient(ellipse at 50% -10%, var(--ink-vignette) 0%, var(--ink) 65%);
+}
+
+/* ---------- Header / marquee ---------- */
+
+header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1.85rem 2rem 1.6rem;
+  background: linear-gradient(180deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+}
+
+header::before,
+header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 9px;
+  background-image: repeating-radial-gradient(
+    circle at 10px 4px,
+    var(--ink) 0 3px,
+    transparent 4px 22px
+  );
+}
+
+header::before {
+  top: 0;
+}
+
+header::after {
+  bottom: 0;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.6rem;
+  letter-spacing: 0.01em;
+  color: var(--paper);
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+nav a {
+  position: relative;
+  padding-bottom: 5px;
+  color: var(--paper);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+nav a:hover::after,
+nav a.ativo::after {
+  transform: scaleX(1);
+}
+
+nav a.ativo {
+  color: var(--gold-light);
+}
+
+/* ---------- Palco principal ---------- */
+
+main {
+  display: flex;
+  justify-content: center;
+  padding: clamp(2.5rem, 6vw, 5rem) 1.25rem;
+}
+
+/* ---------- O ingresso ---------- */
+
+.ticket {
+  display: flex;
+  width: 100%;
+  max-width: 620px;
+  background: var(--paper);
+  color: var(--text-on-paper);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.ticket-main {
+  flex: 1;
+  padding: 2.5rem 2.5rem 2.75rem;
+  min-width: 0;
+}
+
+.ticket h2 {
+  margin: 0 0 1.85rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  color: var(--text-on-paper);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.field label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.field input {
+  border: none;
+  border-bottom: 2px solid var(--paper-line);
+  background: transparent;
+  padding: 0.4rem 0.1rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text-on-paper);
+  transition: border-color 0.2s ease;
+}
+
+.field input::placeholder {
+  color: #b3a488;
+}
+
+.field input:focus {
+  outline: none;
+  border-bottom-color: var(--maroon);
+}
+
+.field input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+button[type="submit"] {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1.9rem;
+  border: 2px solid var(--ink);
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transform: rotate(-1deg);
+  box-shadow: 3px 3px 0 var(--maroon);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+button[type="submit"]:hover {
+  transform: rotate(0deg) translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--maroon);
+  background: var(--gold-light);
+}
+
+button[type="submit"]:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--maroon);
+}
+
+button[type="submit"]:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+/* ---------- Canhoto do ingresso ---------- */
+
+.ticket-stub {
+  width: 108px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.75rem 0.5rem;
+  border-left: 3px dashed var(--paper-line);
+  background: #ebdec2;
+}
+
+.stub-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  color: var(--maroon);
+}
+
+.stub-stars {
+  color: var(--gold);
+  font-size: 0.75rem;
+  letter-spacing: -0.05em;
+  writing-mode: vertical-rl;
+}
+
+.stub-number {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+}
+
+/* ---------- Responsivo ---------- */
+
+@media (max-width: 640px) {
+  .ticket {
+    flex-direction: column;
+  }
+
+  .ticket-stub {
+    width: 100%;
+    flex-direction: row;
+    border-left: none;
+    border-top: 3px dashed var(--paper-line);
+    padding: 1rem 1.5rem;
+  }
+
+  .stub-label,
+  .stub-stars,
+  .stub-number {
+    writing-mode: horizontal-tb;
+  }
+
+  .ticket-main {
+    padding: 2.25rem 1.5rem 2rem;
+  }
+}
+
+@media (max-width: 420px) {
+  header {
+    padding: 1.6rem 1.25rem 1.4rem;
+  }
+
+  nav {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- Preferências de movimento ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  nav a::after,
+  button[type="submit"] {
+    transition: none;
+  }
+}

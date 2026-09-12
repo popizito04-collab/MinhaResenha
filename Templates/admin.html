@@ -1,0 +1,132 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Painel Administrativo - MinhaResenha</title>
+</head>
+
+<body>
+
+    <header>
+
+        <h1>MinhaResenha</h1>
+
+        <nav>
+            <a href="/filmes">Filmes</a>
+            <a href="/resenhas">Resenhas</a>
+            <a href="/admin">Administração</a>
+        </nav>
+
+    </header>
+
+    <main>
+
+        <h2>👑 Painel Administrativo</h2>
+
+        <h2>➕ Adicionar filme</h2>
+
+        <form action="/admin/adicionar-filme" method="POST" enctype="multipart/form-data">
+
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" name="titulo" required>
+
+            <br><br>
+
+            <label for="ano">Ano:</label>
+            <input type="number" id="ano" name="ano" required>
+
+            <br><br>
+
+            <label for="genero">Gênero:</label>
+            <input type="text" id="genero" name="genero" required>
+
+            <br><br>
+
+            <label for="sinopse">Sinopse:</label>
+            <br>
+            <textarea id="sinopse" name="sinopse" required></textarea>
+
+            <br><br>
+
+            <label for="imagem">Imagem do filme:</label>
+            <input
+                type="file"
+                id="imagem"
+                name="imagem"
+                accept="image/*"
+                required
+            >
+
+            <br><br>
+
+            <button type="submit">➕ Adicionar filme</button>
+
+        </form>
+
+        <h2>🎬 Filmes cadastrados</h2>
+
+        {% for filme in filmes %}
+
+            <div>
+
+                <h3>{{ filme[1] }}</h3>
+
+                <p>📅 Ano: {{ filme[2] }}</p>
+
+                <p>🎭 Gênero: {{ filme[3] }}</p>
+
+                <img
+                    src="{{ url_for('static', filename='imagens/' + filme[5]) }}"
+                    width="150"
+                >
+
+            </div>
+
+
+             <a href="/admin/editar-filme/{{ filme[0] }}">
+        ✏️ Editar
+    </a>
+
+            <hr>
+
+        {% endfor %}
+
+        <h2>💬 Resenhas dos usuários</h2>
+
+        {% for resenha in resenhas %}
+
+            <div>
+
+                <h3>🎬 {{ resenha[4] }}</h3>
+
+                <p>👤 Usuário: {{ resenha[3] }}</p>
+
+                <p>⭐ Nota: {{ resenha[2] }}/5</p>
+
+                <p>{{ resenha[1] }}</p>
+
+                <form
+                    action="/admin/excluir-resenha/{{ resenha[0] }}"
+                    method="POST"
+                >
+
+                    <button type="submit">🗑️ Excluir</button>
+
+                </form>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    </main>
+
+</body>
+
+</html>
+```

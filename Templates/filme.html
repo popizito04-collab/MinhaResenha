@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ filme[1] }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='filme.css') }}">
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>MinhaResenha</h1>
+
+        <nav>
+            <a href="/filmes">Filmes</a>
+            
+            <a href="/cadastro">Cadastrar</a>
+            <a href="/login">Entrar</a>
+            <a href="/logout">Sair</a>
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <h1>{{ filme[1] }}</h1>
+
+
+        <h2>Sinopse</h2>
+
+        <p>
+            {{ filme[4] }}
+        </p>
+
+
+        <h2>Avaliação</h2>
+
+        <p>
+            ⭐ Nota geral:
+            <span id="notaGeral">0</span>/5
+        </p>
+
+
+        <h3>🎭 Elenco</h3>
+
+        <div class="estrelas" data-categoria="Elenco">
+
+            <span data-nota="1">⭐</span>
+            <span data-nota="2">⭐</span>
+            <span data-nota="3">⭐</span>
+            <span data-nota="4">⭐</span>
+            <span data-nota="5">⭐</span>
+
+        </div>
+
+        <p id="notaElenco"></p>
+
+
+        <h3>🎬 Direção</h3>
+
+        <div class="estrelas" data-categoria="Direção">
+
+            <span data-nota="1">⭐</span>
+            <span data-nota="2">⭐</span>
+            <span data-nota="3">⭐</span>
+            <span data-nota="4">⭐</span>
+            <span data-nota="5">⭐</span>
+
+        </div>
+
+        <p id="notaDirecao"></p>
+
+
+        <h3>📖 Roteiro</h3>
+
+        <div class="estrelas" data-categoria="Roteiro">
+
+            <span data-nota="1">⭐</span>
+            <span data-nota="2">⭐</span>
+            <span data-nota="3">⭐</span>
+            <span data-nota="4">⭐</span>
+            <span data-nota="5">⭐</span>
+
+        </div>
+
+        <p id="notaRoteiro"></p>
+
+
+        <h3>👗 Figurino</h3>
+
+        <div class="estrelas" data-categoria="Figurino">
+
+            <span data-nota="1">⭐</span>
+            <span data-nota="2">⭐</span>
+            <span data-nota="3">⭐</span>
+            <span data-nota="4">⭐</span>
+            <span data-nota="5">⭐</span>
+
+        </div>
+
+        <p id="notaFigurino"></p>
+
+
+        <h3>🎵 Trilha sonora</h3>
+
+        <div class="estrelas" data-categoria="Trilha sonora">
+
+            <span data-nota="1">⭐</span>
+            <span data-nota="2">⭐</span>
+            <span data-nota="3">⭐</span>
+            <span data-nota="4">⭐</span>
+            <span data-nota="5">⭐</span>
+
+        </div>
+
+        <p id="notaTrilha"></p>
+
+
+        <hr>
+
+
+        {% if session.get("usuario_id") %}
+
+            <h2>📝 Sua resenha</h2>
+
+            <p>
+                Olá, {{ session.get("usuario_nome") }}! Escreva sua opinião sobre o filme.
+            </p>
+
+            <form
+                action="/filme/{{ filme[0] }}/resenha"
+                method="POST"
+            >
+
+                <textarea
+                    name="texto"
+                    placeholder="Escreva sua opinião sobre o filme..."
+                    required
+                ></textarea>
+
+                <br><br>
+
+                <label for="nota">Nota:</label>
+
+                <select name="nota" id="nota" required>
+
+                    <option value="">
+                        Escolha uma nota
+                    </option>
+
+                    <option value="1">
+                        ⭐ 1
+                    </option>
+
+                    <option value="2">
+                        ⭐ 2
+                    </option>
+
+                    <option value="3">
+                        ⭐ 3
+                    </option>
+
+                    <option value="4">
+                        ⭐ 4
+                    </option>
+
+                    <option value="5">
+                        ⭐ 5
+                    </option>
+
+                </select>
+
+                <br><br>
+
+                <button type="submit">
+                    Enviar resenha
+                </button>
+
+            </form>
+
+        {% else %}
+
+            <h2>📝 Quer escrever uma resenha?</h2>
+
+            <p>
+                Você precisa estar logado para escrever uma resenha.
+            </p>
+
+            <a href="/login">
+                Entrar na minha conta
+            </a>
+
+            <br><br>
+
+            <a href="/cadastro">
+                Criar uma conta
+            </a>
+
+        {% endif %}
+
+
+        <hr>
+
+
+        <h2>💬 Resenhas dos usuários</h2>
+
+
+        {% if resenhas %}
+
+            {% for resenha in resenhas %}
+
+                <div class="resenha">
+
+                    <h3>
+                        👤 {{ resenha[2] }}
+                    </h3>
+
+                    <p>
+                        ⭐ {{ resenha[1] }}/5
+                    </p>
+
+                    <p>
+                        {{ resenha[0] }}
+                    </p>
+
+                </div>
+
+                <hr>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>
+                Esse filme ainda não possui resenhas.
+            </p>
+
+        {% endif %}
+
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='letterbox.js') }}"></script>
+
+</body>
+
+</html>
