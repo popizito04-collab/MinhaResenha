@@ -54,14 +54,23 @@ header {
 
 header h1 {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: -0.01em;
 }
 
 header h1::before {
-  content: "🎞";
-  margin-right: 8px;
+  content: "";
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  background-image: url("imagens/logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 nav {
