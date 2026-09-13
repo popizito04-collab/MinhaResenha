@@ -1,229 +1,334 @@
+/* =========================================================
+   MinhaResenha — página de avaliação do filme
+   Mesma identidade visual escura do grid de filmes.
+   ========================================================= */
 
-/* =========================
-   RESET
-========================= */
+:root {
+  --bg: #14181c;
+  --surface: #1c2228;
+  --surface-raised: #232a31;
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #d9e2e9;
+  --text-muted: #8a9ba8;
+  --green: #00e054;
+  --orange: #ff8000;
+  --blue: #40bcf4;
+  --radius: 4px;
+}
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #14181c;
-    color: #ffffff;
-    min-height: 100vh;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
 }
 
-
-/* =========================
-   CABEÇALHO
-========================= */
+/* ---------- Header (igual à página de listagem) ---------- */
 
 header {
-    background-color: #1b2228;
-    padding: 20px 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #303840;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 32px;
+  background: rgba(20, 24, 28, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--border);
 }
 
 header h1 {
-    color: #00e054;
-    font-size: 28px;
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+header h1::before {
+  content: "🎞";
+  margin-right: 8px;
 }
 
 nav {
-    display: flex;
-    gap: 30px;
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
 }
 
 nav a {
-    color: #c9d0d6;
-    text-decoration: none;
-    transition: 0.2s;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 4px 2px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-nav a:hover {
-    color: #00e054;
+nav a:hover,
+nav a:focus-visible {
+  color: var(--text);
+  border-bottom-color: var(--green);
 }
 
-
-/* =========================
-   CONTEÚDO DO FILME
-========================= */
+/* ---------- Main content ---------- */
 
 main {
-    max-width: 900px;
-    margin: 50px auto;
-    padding: 0 30px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
 }
 
 main > h1 {
-    font-size: 42px;
-    margin-bottom: 15px;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin: 0 0 28px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--green);
+}
+
+main h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 40px 0 14px;
+}
+
+main h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 22px 0 8px;
+  color: var(--text);
 }
 
 main > p {
-    color: #aeb6bd;
-    font-size: 17px;
-    margin-bottom: 10px;
+  color: var(--text-muted);
+  max-width: 65ch;
 }
 
-
-/* =========================
-   SEÇÕES
-========================= */
-
-h2 {
-    font-size: 25px;
-    margin-top: 40px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #303840;
-    padding-bottom: 10px;
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 36px 0;
 }
 
-h3 {
-    margin-top: 25px;
-    margin-bottom: 10px;
-}
-
-
-/* =========================
-   NOTA GERAL
-========================= */
+/* ---------- Avaliação / nota geral ---------- */
 
 #notaGeral {
-    color: #00e054;
-    font-size: 30px;
-    font-weight: bold;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--orange);
 }
 
-
-/* =========================
-   ESTRELAS
-========================= */
+/* ---------- Estrelas de avaliação por categoria ---------- */
 
 .estrelas {
-    display: flex;
-    gap: 5px;
-    margin: 10px 0;
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 .estrelas span {
-    font-size: 28px;
-    cursor: pointer;
-    transition: 0.15s;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  filter: grayscale(1) opacity(0.4);
+  transform-origin: center;
+  transition: filter 0.12s ease, transform 0.12s ease;
 }
 
-.estrelas span:hover {
-    transform: scale(1.2);
+/* passar o mouse acende a estrela e todas as anteriores */
+.estrelas span:hover,
+.estrelas span:has(~ span:hover) {
+  filter: grayscale(0) opacity(1);
+  transform: scale(1.08);
 }
 
-.resultadoNota {
-    color: #00e054;
-    font-weight: bold;
-    margin-bottom: 20px;
+/* classe que o JS pode aplicar para manter a nota escolhida
+   depois do clique (ajuste o nome se o seu script usar outro) */
+.estrelas span.selecionada {
+  filter: grayscale(0) opacity(1);
 }
 
+.estrelas span:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
 
-/* =========================
-   RESENHA
-========================= */
+main p[id^="nota"] {
+  min-height: 1.2em;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 6px 0 0;
+}
+
+/* ---------- Formulário de resenha ---------- */
+
+form {
+  margin-top: 12px;
+  max-width: 560px;
+}
+
+textarea,
+select {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 0.92rem;
+}
 
 textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+  border-color: var(--blue);
+}
+
+label {
+  display: inline-block;
+  margin-right: 10px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+select {
+  width: auto;
+  min-width: 180px;
+}
+
+button[type="submit"] {
+  background: var(--green);
+  color: #0c1a12;
+  border: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+button[type="submit"]:hover {
+  background: #2dfb74;
+}
+
+button[type="submit"]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* ---------- Aviso para quem não está logado ---------- */
+
+main > a {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+main > a[href="/login"] {
+  background: var(--green);
+  color: #0c1a12;
+}
+
+main > a[href="/login"]:hover {
+  background: #2dfb74;
+}
+
+main > a[href="/cadastro"] {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+main > a[href="/cadastro"]:hover {
+  border-color: var(--text-muted);
+}
+
+main > a:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* ---------- Resenhas dos usuários ---------- */
+
+.resenha {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin: 16px 0;
+}
+
+.resenha h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.resenha p {
+  margin: 4px 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.resenha p:first-of-type {
+  color: var(--orange);
+  font-weight: 600;
+}
+
+main > p:last-child:not([id]) {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ---------- Responsivo ---------- */
+
+@media (max-width: 640px) {
+  header {
+    padding: 12px 18px;
+  }
+
+  main {
+    padding: 28px 16px 60px;
+  }
+
+  main > h1 {
+    font-size: 1.6rem;
+  }
+
+  .estrelas span {
+    font-size: 1.4rem;
+  }
+
+  select {
     width: 100%;
-    min-height: 180px;
-    margin-top: 10px;
-    padding: 15px;
-
-    background-color: #1b2228;
-    color: #ffffff;
-
-    border: 1px solid #303840;
-    border-radius: 8px;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-
-    resize: vertical;
+  }
 }
-
-textarea:focus {
-    outline: none;
-    border-color: #00e054;
-}
-
-
-/* =========================
-   BOTÃO
-========================= */
-
-button {
-    margin-top: 15px;
-    padding: 12px 25px;
-
-    background-color: #00e054;
-    color: #101418;
-
-    border: none;
-    border-radius: 6px;
-
-    font-weight: bold;
-    font-size: 15px;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-button:hover {
-    background-color: #ffffff;
-    transform: scale(1.03);
-}
-
-
-/* =========================
-   RESULTADO DA RESENHA
-========================= */
-
-#resultado {
-    margin-top: 20px;
-    padding: 15px;
-
-    background-color: #1b2228;
-    border-left: 4px solid #00e054;
-
-    color: #d8dde1;
-    line-height: 1.5;
-}
-
-
-/* =========================
-   RESPONSIVIDADE
-========================= */
-
-@media (max-width: 700px) {
-
-    header {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-    }
-
-    nav {
-        gap: 15px;
-    }
-
-    main {
-        margin-top: 30px;
-        padding: 0 20px;
-    }
-
-    main > h1 {
-        font-size: 32px;
-    }
-}
-
