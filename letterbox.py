@@ -310,64 +310,6 @@ def filme(id):
         resenhas=resenhas
     )
 
-@app.route("/perfil", methods=["GET", "POST"])
-def perfil():
-
-    if "usuario_id" not in session:
-        return redirect(url_for("login"))
-
-    usuario_id = session["usuario_id"]
-
-    conexao = sqlite3.connect("filmes.db")
-    cursor = conexao.cursor()
-
-    if request.method == "POST":
-
-        nome = request.form["nome"]
-        email = request.form["email"]
-        senha = request.form["senha"]
-
-        foto = request.files["foto"]
-
-        if foto and foto.filename:
-
-            nome_foto = secure_filename(foto.filename)
-
-            pasta = "static/imagens/perfis"
-
-            os.makedirs(pasta, exist_ok=True)
-
-            foto.save(os.path.join(pasta, nome_foto))
-
-            cursor.execute("""
-                UPDATE usuarios
-                SET nome = ?, email = ?, senha = ?, foto = ?
-                WHERE id = ?
-            """, (nome, email, senha, nome_foto, usuario_id))
-
-        else:
-
-            cursor.execute("""
-                UPDATE usuarios
-                SET nome = ?, email = ?, senha = ?
-                WHERE id = ?
-            """, (nome, email, senha, usuario_id))
-
-        conexao.commit()
-
-        session["usuario_nome"] = nome
-
-    cursor.execute(
-        "SELECT * FROM usuarios WHERE id = ?",
-        (usuario_id,)
-    )
-
-    usuario = cursor.fetchone()
-
-    conexao.close()
-
-    return render_template("perfil.html", usuario=usuario)
-
 
 @app.route("/logout")
 def logout():
