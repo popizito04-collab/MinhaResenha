@@ -1,14 +1,16 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-import sqlite3
 import os
+import psycopg2
 from werkzeug.utils import secure_filename
-import sqlite3
 from flask import Flask, render_template, request, session, redirect, url_for
 
 
 app = Flask(__name__)
 app.secret_key = "minha-chave-secreta"
 
+
+def conectar():
+    return psycopg2.connect(os.environ["DATABASE_URL"])
 
 
 @app.route("/admin/editar-filme/<int:id>", methods=["GET", "POST"])
@@ -17,7 +19,7 @@ def editar_filme(id):
     if session.get("admin") != 1:
         return "Acesso negado!", 403
 
-    conexao = sqlite3.connect("filmes.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     if request.method == "POST":
@@ -29,7 +31,6 @@ def editar_filme(id):
 
         imagem = request.files["imagem"]
 
-        # Se o admin escolheu uma nova imagem
         if imagem and imagem.filename:
 
             nome_imagem = secure_filename(imagem.filename)
@@ -40,8 +41,12 @@ def editar_filme(id):
 
             cursor.execute("""
                 UPDATE filmes
-                SET titulo = ?, ano = ?, genero = ?, sinopse = ?, imagem = ?
-                WHERE id = ?
+                SET titulo = %s,
+                    ano = %s,
+                    genero = %s,
+                    sinopse = %s,
+                    imagem = %s
+                WHERE id = %s
             """, (
                 titulo,
                 ano,
@@ -55,8 +60,11 @@ def editar_filme(id):
 
             cursor.execute("""
                 UPDATE filmes
-                SET titulo = ?, ano = ?, genero = ?, sinopse = ?
-                WHERE id = ?
+                SET titulo = %s,
+                    ano = %s,
+                    genero = %s,
+                    sinopse = %s
+                WHERE id = %s
             """, (
                 titulo,
                 ano,
@@ -71,7 +79,7 @@ def editar_filme(id):
         return redirect(url_for("admin"))
 
     cursor.execute(
-        "SELECT * FROM filmes WHERE id = ?",
+        "SELECT * FROM filmes WHERE id = %s",
         (id,)
     )
 
@@ -83,8 +91,9 @@ def editar_filme(id):
         "editar_filme.html",
         filme=filme
     )
-@app.route("/admin/adicionar-filme", methods=["POST"])
 
+
+@app.route("/admin/adicionar-filme", methods=["POST"])
 def adicionar_filme():
 
     if session.get("admin") != 1:
@@ -103,18 +112,25 @@ def adicionar_filme():
 
     imagem.save(os.path.join(pasta, nome_imagem))
 
-    conexao = sqlite3.connect("filmes.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
         INSERT INTO filmes (titulo, ano, genero, sinopse, imagem)
-        VALUES (?, ?, ?, ?, ?)
-    """, (titulo, ano, genero, sinopse, nome_imagem))
+        VALUES (%s, %s, %s, %s, %s)
+    """, (
+        titulo,
+        ano,
+        genero,
+        sinopse,
+        nome_imagem
+    ))
 
     conexao.commit()
     conexao.close()
 
     return redirect(url_for("admin"))
+
 
 @app.route("/admin/excluir-resenha/<int:id>", methods=["POST"])
 def excluir_resenha(id):
@@ -122,11 +138,11 @@ def excluir_resenha(id):
     if session.get("admin") != 1:
         return "Acesso negado!", 403
 
-    conexao = sqlite3.connect("filmes.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute(
-        "DELETE FROM resenhas WHERE id = ?",
+        "DELETE FROM resenhas WHERE id = %s",
         (id,)
     )
 
@@ -135,23 +151,30 @@ def excluir_resenha(id):
 
     return redirect(url_for("admin"))
 
+
 @app.route("/admin")
 def admin():
 
     if session.get("admin") != 1:
         return "Acesso negado!", 403
 
-    conexao = sqlite3.connect("filmes.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("SELECT * FROM filmes")
     filmes = cursor.fetchall()
 
     cursor.execute("""
-        SELECT resenhas.id, resenhas.texto, resenhas.nota, usuarios.nome, filmes.titulo
+        SELECT resenhas.id,
+               resenhas.texto,
+               resenhas.nota,
+               usuarios.nome,
+               filmes.titulo
         FROM resenhas
-        JOIN usuarios ON resenhas.usuario_id = usuarios.id
-        JOIN filmes ON resenhas.filme_id = filmes.id
+        JOIN usuarios
+            ON resenhas.usuario_id = usuarios.id
+        JOIN filmes
+            ON resenhas.filme_id = filmes.id
         ORDER BY resenhas.id DESC
     """)
 
@@ -166,15 +189,13 @@ def admin():
     )
 
 
-
-
 @app.route("/filmes")
 def filmes():
 
     if "usuario_id" not in session:
         return redirect(url_for("login"))
 
-    conexao = sqlite3.connect("filmes.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("SELECT * FROM filmes")
@@ -183,9 +204,10 @@ def filmes():
 
     conexao.close()
 
-    return render_template("letterbox.html", filmes=filmes)
-
-@app.route("/filme/<int:id>/resenha", methods=["POST"])
+    return render_template(
+        "letterbox.html",
+        filmes=filmes
+    )
 
 
 @app.route("/filme/<int:id>/resenha", methods=["POST"])
@@ -199,18 +221,26 @@ def enviar_resenha(id):
 
     usuario_id = session["usuario_id"]
 
-    conexao = sqlite3.connect("filmes.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
-    INSERT INTO resenhas (usuario_id, filme_id, texto, nota)
-    VALUES (?, ?, ?, ?)
-    """, (usuario_id, id, texto, nota))
+        INSERT INTO resenhas
+        (usuario_id, filme_id, texto, nota)
+        VALUES (%s, %s, %s, %s)
+    """, (
+        usuario_id,
+        id,
+        texto,
+        nota
+    ))
 
     conexao.commit()
     conexao.close()
 
     return redirect(url_for("filme", id=id))
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -219,30 +249,46 @@ def login():
         email = request.form["email"]
         senha = request.form["senha"]
 
-        conexao = sqlite3.connect("filmes.db")
+        conexao = conectar()
         cursor = conexao.cursor()
 
         cursor.execute(
-            "SELECT * FROM usuarios WHERE email = ? AND senha = ?",
-            (email, senha)
+            "SELECT * FROM usuarios WHERE email = %s",
+            (email,)
         )
 
         usuario = cursor.fetchone()
 
         conexao.close()
-        if usuario:
-            session["usuario_id"] = usuario[0]
-            session["usuario_nome"] = usuario[1]
-            session["admin"] = usuario[4]
-            if session["admin"] == 1:
-                return redirect(url_for("admin"))
-            return redirect(url_for("filmes"))
-        
 
-        else:
-            return "Email ou senha incorretos!"
+        if usuario:
+
+            if usuario[3] == senha:
+
+                session["usuario_id"] = usuario[0]
+                session["usuario_nome"] = usuario[1]
+                session["admin"] = usuario[4]
+
+                if session["admin"] == 1:
+                    return redirect(url_for("admin"))
+
+                return redirect(url_for("filmes"))
+
+            elif check_password_hash(usuario[3], senha):
+
+                session["usuario_id"] = usuario[0]
+                session["usuario_nome"] = usuario[1]
+                session["admin"] = usuario[4]
+
+                if session["admin"] == 1:
+                    return redirect(url_for("admin"))
+
+                return redirect(url_for("filmes"))
+
+        return "Email ou senha incorretos!"
 
     return render_template("login.html")
+
 
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
@@ -253,13 +299,20 @@ def cadastro():
         email = request.form["email"]
         senha = request.form["senha"]
 
-        conexao = sqlite3.connect("filmes.db")
+        conexao = conectar()
         cursor = conexao.cursor()
 
+        senha_hash = generate_password_hash(senha)
+
         cursor.execute("""
-        INSERT INTO usuarios (nome, email, senha)
-        VALUES (?, ?, ?)
-        """, (nome, email, senha))
+            INSERT INTO usuarios
+            (nome, email, senha)
+            VALUES (%s, %s, %s)
+        """, (
+            nome,
+            email,
+            senha_hash
+        ))
 
         conexao.commit()
         conexao.close()
@@ -269,34 +322,45 @@ def cadastro():
     return render_template("cadastro.html")
 
 
-
-
-@app.route("/") 
+@app.route("/")
 def inicio():
-    return render_template("login.html")
 
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("SELECT * FROM filmes")
+
+    filmes = cursor.fetchall()
+
+    conexao.close()
+
+    return render_template(
+        "letterbox.html",
+        filmes=filmes
+    )
 
 
 @app.route("/filme/<int:id>")
 def filme(id):
 
-    conexao = sqlite3.connect("filmes.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
-    
     cursor.execute(
-        "SELECT * FROM filmes WHERE id = ?",
+        "SELECT * FROM filmes WHERE id = %s",
         (id,)
     )
 
     filme = cursor.fetchone()
 
-    
     cursor.execute("""
-        SELECT resenhas.texto, resenhas.nota, usuarios.nome
+        SELECT resenhas.texto,
+               resenhas.nota,
+               usuarios.nome
         FROM resenhas
-        JOIN usuarios ON resenhas.usuario_id = usuarios.id
-        WHERE resenhas.filme_id = ?
+        JOIN usuarios
+            ON resenhas.usuario_id = usuarios.id
+        WHERE resenhas.filme_id = %s
         ORDER BY resenhas.id DESC
     """, (id,))
 
