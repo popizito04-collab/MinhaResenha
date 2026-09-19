@@ -259,13 +259,22 @@ def enviar_resenha(id):
         return redirect(url_for("login"))
 
     texto = request.form["texto"]
-    nota = float(request.form["nota"])
 
-    elenco = float(request.form["elenco"])
-    direcao = float(request.form["direcao"])
-    roteiro = float(request.form["roteiro"])
-    figurino = float(request.form["figurino"])
-    trilha_sonora = float(request.form["trilha_sonora"])
+    try:
+        nota = float(request.form["nota"])
+
+        elenco = float(request.form["elenco"])
+        direcao = float(request.form["direcao"])
+        roteiro = float(request.form["roteiro"])
+        figurino = float(request.form["figurino"])
+        trilha_sonora = float(request.form["trilha_sonora"])
+
+    except (ValueError, TypeError):
+        return """
+        <h2>Você precisa avaliar todas as categorias ⭐</h2>
+        <p>Escolha as estrelas para Elenco, Direção, Roteiro, Figurino e Trilha sonora.</p>
+        <a href="javascript:history.back()">Voltar</a>
+        """, 400
 
     media_categorias = (
         elenco +
@@ -461,12 +470,15 @@ def inicio():
         nota_turma=nota_turma
     )
 
+
+
 @app.route("/filme/<int:id>")
 def filme(id):
 
     conexao = conectar()
     cursor = conexao.cursor()
 
+    # Busca o filme
     cursor.execute(
         "SELECT * FROM filmes WHERE id = %s",
         (id,)
@@ -474,6 +486,8 @@ def filme(id):
 
     filme = cursor.fetchone()
 
+
+    # Busca as resenhas
     cursor.execute("""
         SELECT resenhas.texto,
                resenhas.nota,
@@ -487,14 +501,32 @@ def filme(id):
 
     resenhas = cursor.fetchall()
 
+
+    # Calcula a média geral das categorias
+    cursor.execute("""
+        SELECT AVG(media_categorias)
+        FROM resenhas
+        WHERE filme_id = %s
+    """, (id,))
+
+    resultado = cursor.fetchone()
+
+    media_filme = resultado[0]
+
+
+    # Converte de 0-5 para 0-10
+    if media_filme is not None:
+        media_filme = round(float(media_filme) * 2, 1)
+
+
     conexao.close()
 
     return render_template(
         "filme.html",
         filme=filme,
-        resenhas=resenhas
+        resenhas=resenhas,
+        media_filme=media_filme
     )
-
 
 @app.route("/logout")
 def logout():
