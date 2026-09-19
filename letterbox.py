@@ -290,6 +290,10 @@ def login():
     return render_template("login.html")
 
 
+
+
+
+
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
 
@@ -308,19 +312,26 @@ def cadastro():
             INSERT INTO usuarios
             (nome, email, senha)
             VALUES (%s, %s, %s)
+            RETURNING id
         """, (
             nome,
             email,
             senha_hash
         ))
 
+        usuario_id = cursor.fetchone()[0]
+
         conexao.commit()
         conexao.close()
 
-        return "Cadastro realizado com sucesso!"
+        # Já deixa o usuário logado
+        session["usuario_id"] = usuario_id
+        session["usuario_nome"] = nome
+        session["admin"] = 0
+
+        return redirect(url_for("filmes"))
 
     return render_template("cadastro.html")
-
 
 @app.route("/")
 def inicio():
