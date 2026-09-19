@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+
+    <link rel="icon" href="{{ url_for('static', filename='imagens/logo.png') }}">
+
+    <title>Resenhas dos Alunos - MinhaResenha</title>
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>MinhaResenha</h1>
+
+        <nav>
+
+            <a href="/admin">Administração</a>
+
+            <a href="/admin/resenhas">Resenhas</a>
+
+            <a href="/filmes">Filmes</a>
+
+            <a href="/logout">Sair</a>
+
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <h2>💬 Resenhas dos Alunos</h2>
+
+        <p>
+            Aqui estão as resenhas enviadas pelos alunos.
+        </p>
+
+
+        {% if resenhas %}
+
+            {% for resenha in resenhas %}
+
+                <div class="resenha-admin">
+
+                    <h3>
+                         {{ resenha[4] }}
+                    </h3>
+
+                    <p>
+                        👤 <strong>Aluno:</strong> {{ resenha[3] }}
+                    </p>
+
+                    <p>
+                        ⭐ <strong>Nota:</strong> {{ resenha[2] }}/10
+                    </p>
+
+                    <p>
+                         <strong>Resenha:</strong>
+                    </p>
+
+                    <p>
+                        {{ resenha[1] }}
+                    </p>
+
+
+                    <form
+                        action="/admin/excluir-resenha/{{ resenha[0] }}"
+                        method="POST"
+                    >
+
+                        <button type="submit">
+                             Excluir resenha
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div>
+
+                <h3>Nenhuma resenha ainda </h3>
+
+                <p>
+                    Os alunos ainda não enviaram nenhuma resenha.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+</body>
+
+</html>

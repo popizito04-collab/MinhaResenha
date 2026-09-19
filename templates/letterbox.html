@@ -41,7 +41,19 @@
 
     <p>🎭 Gênero: {{ filme[3] }}</p>
 
-    <p>⭐ Nota: 4.8/5</p>
+   {% set nota_filme = namespace(valor=None) %}
+
+{% for item in notas %}
+    {% if item[0] == filme[0] %}
+        {% set nota_filme.valor = item[1] %}
+    {% endif %}
+{% endfor %}
+
+{% if nota_filme.valor is not none %}
+    <p>⭐ Nota: {{ nota_filme.valor }}/10</p>
+{% else %}
+    <p>⭐ Nota: Ainda não avaliado</p>
+{% endif %}
 
     <a href="/filme/{{ filme[0] }}">Ver filme</a>
 

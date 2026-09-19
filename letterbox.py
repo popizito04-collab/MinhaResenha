@@ -152,6 +152,40 @@ def excluir_resenha(id):
     return redirect(url_for("admin"))
 
 
+@app.route("/admin/nota-filme/<int:filme_id>", methods=["POST"])
+def nota_filme(filme_id):
+
+    if session.get("admin") != 1:
+        return "Acesso negado!", 403
+
+    nota = request.form["nota"]
+
+    try:
+        nota = float(nota)
+    except ValueError:
+        return "Nota inválida!", 400
+
+    if nota < 0 or nota > 10:
+        return "A nota deve estar entre 0 e 10!", 400
+
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+        INSERT INTO nota_turma (filme_id, nota)
+        VALUES (%s, %s)
+        ON CONFLICT (filme_id)
+        DO UPDATE SET nota = EXCLUDED.nota
+    """, (
+        filme_id,
+        nota
+    ))
+
+    conexao.commit()
+    conexao.close()
+
+    return redirect(url_for("admin"))
+
 @app.route("/admin")
 def admin():
 
@@ -199,14 +233,22 @@ def filmes():
     cursor = conexao.cursor()
 
     cursor.execute("SELECT * FROM filmes")
-
     filmes = cursor.fetchall()
+
+    cursor.execute("SELECT nota FROM nota_turma LIMIT 1")
+    resultado = cursor.fetchone()
+
+    if resultado:
+        nota_turma = resultado[0]
+    else:
+        nota_turma = None
 
     conexao.close()
 
     return render_template(
         "letterbox.html",
-        filmes=filmes
+        filmes=filmes,
+        nota_turma=nota_turma
     )
 
 
@@ -217,7 +259,21 @@ def enviar_resenha(id):
         return redirect(url_for("login"))
 
     texto = request.form["texto"]
-    nota = request.form["nota"]
+    nota = float(request.form["nota"])
+
+    elenco = float(request.form["elenco"])
+    direcao = float(request.form["direcao"])
+    roteiro = float(request.form["roteiro"])
+    figurino = float(request.form["figurino"])
+    trilha_sonora = float(request.form["trilha_sonora"])
+
+    media_categorias = (
+        elenco +
+        direcao +
+        roteiro +
+        figurino +
+        trilha_sonora
+    ) / 5
 
     usuario_id = session["usuario_id"]
 
@@ -226,13 +282,30 @@ def enviar_resenha(id):
 
     cursor.execute("""
         INSERT INTO resenhas
-        (usuario_id, filme_id, texto, nota)
-        VALUES (%s, %s, %s, %s)
+        (
+            usuario_id,
+            filme_id,
+            texto,
+            nota,
+            elenco,
+            direcao,
+            roteiro,
+            figurino,
+            trilha_sonora,
+            media_categorias
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """, (
         usuario_id,
         id,
         texto,
-        nota
+        nota,
+        elenco,
+        direcao,
+        roteiro,
+        figurino,
+        trilha_sonora,
+        media_categorias
     ))
 
     conexao.commit()
@@ -240,6 +313,37 @@ def enviar_resenha(id):
 
     return redirect(url_for("filme", id=id))
 
+@app.route("/admin/resenhas")
+def admin_resenhas():
+
+    if session.get("admin") != 1:
+        return "Acesso negado!", 403
+
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+        SELECT resenhas.id,
+               resenhas.texto,
+               resenhas.nota,
+               usuarios.nome,
+               filmes.titulo
+        FROM resenhas
+        JOIN usuarios
+            ON resenhas.usuario_id = usuarios.id
+        JOIN filmes
+            ON resenhas.filme_id = filmes.id
+        ORDER BY resenhas.id DESC
+    """)
+
+    resenhas = cursor.fetchall()
+
+    conexao.close()
+
+    return render_template(
+        "admin_resenhas.html",
+        resenhas=resenhas
+    )
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -332,7 +436,6 @@ def cadastro():
         return redirect(url_for("filmes"))
 
     return render_template("cadastro.html")
-
 @app.route("/")
 def inicio():
 
@@ -340,16 +443,23 @@ def inicio():
     cursor = conexao.cursor()
 
     cursor.execute("SELECT * FROM filmes")
-
     filmes = cursor.fetchall()
+
+    cursor.execute("SELECT nota FROM nota_turma LIMIT 1")
+    resultado = cursor.fetchone()
+
+    if resultado:
+        nota_turma = resultado[0]
+    else:
+        nota_turma = None
 
     conexao.close()
 
     return render_template(
         "letterbox.html",
-        filmes=filmes
+        filmes=filmes,
+        nota_turma=nota_turma
     )
-
 
 @app.route("/filme/<int:id>")
 def filme(id):
