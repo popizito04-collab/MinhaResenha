@@ -3,14 +3,26 @@ import os
 import psycopg2
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, session, redirect, url_for
+import cloudinary
+import cloudinary.uploader
 
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET")
+)
 
 app = Flask(__name__)
 app.secret_key = "minha-chave-secreta"
 
-
 def conectar():
-    return psycopg2.connect(os.environ["DATABASE_URL"])
+    banco = os.getenv("DATABASE_URL")
+
+    if not banco:
+        raise Exception("DATABASE_URL não foi encontrada!")
+
+    return psycopg2.connect(banco)
 
 
 @app.route("/admin/editar-filme/<int:id>", methods=["GET", "POST"])
@@ -106,11 +118,9 @@ def adicionar_filme():
 
     imagem = request.files["imagem"]
 
-    nome_imagem = secure_filename(imagem.filename)
+    resultado = cloudinary.uploader.upload(imagem)
 
-    pasta = "static/imagens"
-
-    imagem.save(os.path.join(pasta, nome_imagem))
+    url_imagem = resultado["secure_url"]
 
     conexao = conectar()
     cursor = conexao.cursor()
@@ -123,7 +133,7 @@ def adicionar_filme():
         ano,
         genero,
         sinopse,
-        nome_imagem
+        url_imagem
     ))
 
     conexao.commit()
